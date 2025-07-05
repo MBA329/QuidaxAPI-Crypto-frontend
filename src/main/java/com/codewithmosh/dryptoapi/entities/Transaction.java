@@ -53,9 +53,12 @@ public class Transaction {
     @Column(name = "transaction_hash")
     private String transactionHash;
 
+    @Column(name = "transaction_id")
+    private String transactionId;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-//    @Column(name = ) //not needed, aim must be achhieved
+//    @Column(name = ) //not needed, aim must be achieved
 //    private LocalDateTime priceLockedAt;
 }

@@ -8,6 +8,7 @@ public class DryptoApiApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DryptoApiApplication.class, args);
+        System.out.println("working now");
     }
 
 }

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: store
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/drypto_api?createDatabaseIfNotExist=true
+    username: root
+    password: admin
+  jpa:
+    show-sql: true
+
+quidax:
+  secretKey: ${QUIDAX_SECRET_KEY}
+  baseUrl: https://app.quidax.io/api/v1

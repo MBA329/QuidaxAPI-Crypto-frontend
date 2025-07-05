@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -15,13 +16,13 @@ import java.util.Set;
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "deposit_address")
     private String depositAddress;
 
-    @Column(name = "market_pair")
-    private String marketPair;
+    @Column(name = "crypto_currency")
+    private String cryptoCurrency;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
