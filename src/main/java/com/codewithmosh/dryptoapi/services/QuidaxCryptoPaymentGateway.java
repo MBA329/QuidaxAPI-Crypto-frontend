@@ -18,7 +18,6 @@ import java.net.http.HttpResponse;
 public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
     private final RestTemplate restTemplate;
 
-
     @Value("${quidax.baseUrl}")
     private String baseUrl;
 

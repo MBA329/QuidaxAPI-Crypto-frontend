@@ -39,9 +39,9 @@ public class Transaction {
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
-    @Column(name = "status")
+    @Column(name = "transaction_status")
     @Enumerated(EnumType.STRING)
-    private TransactionStatus status; // PENDING, PAID, COMPLETED, FAILED, EXPIRED
+    private TransactionStatus transactionStatus; // PENDING, PAID, COMPLETED, FAILED, EXPIRED
 
     @Column(name = "delivery_status")
     @Enumerated(EnumType.STRING)
