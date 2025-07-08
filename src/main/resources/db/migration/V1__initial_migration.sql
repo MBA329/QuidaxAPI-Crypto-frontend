@@ -1,3 +1,22 @@
+create table users
+(
+    id       binary(16) default (uuid_to_bin(uuid())) not null
+        primary key,
+    email    varchar(50)                            not null,
+    password varchar(255)                           not null
+);
+
+create table wallets
+(
+    id              binary(16) default (uuid_to_bin(uuid())) not null
+        primary key,
+    deposit_address varchar(50)                            not null,
+    crypto_currency varchar(15)                            not null,
+    user_id         binary(16)                             not null,
+    constraint wallets_users_id_fk
+        foreign key (user_id) references users (id)
+);
+
 create table transactions
 (
     id                 bigint auto_increment
@@ -8,7 +27,7 @@ create table transactions
     amount_naira       decimal(10, 2)                         not null,
     amount_crypto      decimal(10, 2)                         not null,
     crypto_currency    varchar(25)                            not null,
-    wallet_id          binary(16) default bin_to_uuid(uuid()) not null,
+    wallet_id          binary(16)                             not null,
     transaction_status varchar(15)                            not null,
     delivery_status    varchar(15)                            not null,
     request_id         varchar(30)                            not null,
@@ -19,24 +38,9 @@ create table transactions
         foreign key (wallet_id) references wallets (id)
 );
 
-create table wallets
-(
-    id              binary(16) default uuid_to_bin(uuid()) not null
-        primary key,
-    deposit_address varchar(50)                            not null,
-    crypto_currency varchar(15)                            not null,
-    user_id         binary(16) default uuid_to_bin(uuid()) not null,
-    constraint wallets_users_id_fk
-        foreign key (user_id) references users (id)
-);
 
-create table users
-(
-    id       binary(16) default uuid_to_bin(uuid()) not null
-        primary key,
-    email    varchar(50)                            not null,
-    password varchar(255)                           not null
-);
+
+
 
 
 

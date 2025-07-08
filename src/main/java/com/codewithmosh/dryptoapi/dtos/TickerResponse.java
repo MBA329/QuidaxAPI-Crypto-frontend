@@ -1,8 +1,5 @@
 package com.codewithmosh.dryptoapi.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 

@@ -3,6 +3,7 @@ package com.codewithmosh.dryptoapi.services;
 import com.codewithmosh.dryptoapi.dtos.TickerResponse;
 import com.codewithmosh.dryptoapi.dtos.FetchWalletResponse;
 import com.google.gson.Gson;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

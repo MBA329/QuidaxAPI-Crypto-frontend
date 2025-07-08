@@ -1,9 +1,5 @@
 package com.codewithmosh.dryptoapi.services;
 
-import com.codewithmosh.dryptoapi.dtos.WalletDto;
-
-import java.util.UUID;
-
 public class WalletService {
 
 //    public void loadWallets() {

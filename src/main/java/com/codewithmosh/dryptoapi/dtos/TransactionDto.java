@@ -2,8 +2,6 @@ package com.codewithmosh.dryptoapi.dtos;
 
 import com.codewithmosh.dryptoapi.entities.DeliveryStatus;
 import com.codewithmosh.dryptoapi.entities.TransactionStatus;
-import com.codewithmosh.dryptoapi.entities.Wallet;
-import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
