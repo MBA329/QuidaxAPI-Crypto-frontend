@@ -13,7 +13,7 @@ public class VTPassQueryTransactionResponse {
 
     @Data
     public static class Content {
-        @SerializedName("transaction")
+        @SerializedName("transactions")
         private Transaction transaction;
     }
 

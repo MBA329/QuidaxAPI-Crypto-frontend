@@ -31,6 +31,7 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
 
             HttpRequest getRequest = HttpRequest.newBuilder()
                     .uri(new URI(url))
+                    .header("Content-Type", "application/json")
 //                    .header("Authorization", "Your API Key")
                     .header("accept", "application/json")
                     .GET()

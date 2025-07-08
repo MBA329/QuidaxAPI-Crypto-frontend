@@ -72,13 +72,14 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
 
     public VTPassPurchaseResponse purchaseProduct(VTPassPurchaseRequest request) {
         try {
-            String url = baseUrl + "/service-variations?serviceID=" + request.getServiceID();  // e.g. usdtngn
+            String url = baseUrl + "/pay";
 
             Gson gson = new Gson();
             String jsonRequest = gson.toJson(request);
 
             HttpRequest postRequest = HttpRequest.newBuilder()
                     .uri(new URI(url))
+                    .header("Content-Type", "application/json")
                     .header("api-key", staticApiKey)
                     .header("secret-key", apiKey)
 //                    .header("accept", "application/json")
@@ -108,6 +109,7 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
 
             HttpRequest postRequest = HttpRequest.newBuilder()
                     .uri(new URI(url))
+                    .header("Content-Type", "application/json")
                     .header("api-key", staticApiKey)
                     .header("secret-key", apiKey)
 //                    .header("accept", "application/json")
