@@ -1,11 +1,8 @@
 package com.codewithmosh.dryptoapi.dtos;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 
-@Data
-public class PurchaseRequest {
+public class BuyDataRequest {
 
     private String phoneNumber;
 

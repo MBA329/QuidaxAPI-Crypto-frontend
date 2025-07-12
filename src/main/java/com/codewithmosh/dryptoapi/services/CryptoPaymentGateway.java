@@ -9,4 +9,5 @@ public interface CryptoPaymentGateway {
     public FetchWalletResponse fetchCryptoWallet(String cryptoCurrency);
     public FetchWalletsResponse fetchPaymentAddresses(String cryptoCurrency);
     public FetchWalletResponse createPaymentAddress(String cryptoCurrency);
+    public void processWebhook(String rawPayload);
 }

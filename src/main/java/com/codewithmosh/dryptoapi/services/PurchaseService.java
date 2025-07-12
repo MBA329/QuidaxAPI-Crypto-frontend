@@ -1,11 +1,10 @@
 package com.codewithmosh.dryptoapi.services;
 
-import com.codewithmosh.dryptoapi.constants.MarketPair;
 import com.codewithmosh.dryptoapi.dtos.PurchaseRequest;
 import com.codewithmosh.dryptoapi.dtos.PurchaseResponse;
 import com.codewithmosh.dryptoapi.entities.Transaction;
 import com.codewithmosh.dryptoapi.exceptions.NoActiveWalletException;
-import com.codewithmosh.dryptoapi.exceptions.WalletNotFoundException;
+import com.codewithmosh.dryptoapi.mappers.TransactionMapper;
 import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
 import com.codewithmosh.dryptoapi.repositories.WalletRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -22,12 +22,16 @@ public class PurchaseService {
     private final UtilityServiceGateway serviceGateway;
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
+    private final TransactionMapper transactionMapper;
 
     @Transactional
     public PurchaseResponse makeDataPurchase(PurchaseRequest request) {
-        var activeWallet = walletRepository.findByCryptoCurrencyAndActiveTrue(request.getCryptoCurrency()).orElseThrow(throw new NoActiveWalletException(););
+        var activeWallet = walletRepository.findByCryptoCurrencyAndActiveFalse(request.getCryptoCurrency())
+                .orElseThrow(NoActiveWalletException::new);
         var marketRate = paymentGateway.getBuyPrice(request.getCryptoCurrency().toLowerCase() + "ngn");
         var cryptoPrice = getCryptoPrice(marketRate.getData().getTicker().getBuy(), request.getAmountNaira());
+        activeWallet.setActive(false);
+        var requestId = serviceGateway.generateRequestId();
 
         var transaction = Transaction.builder()
                 .phoneNumber(request.getPhoneNumber())
@@ -36,14 +40,15 @@ public class PurchaseService {
                 .amountNaira(request.getAmountNaira())
                 .cryptoCurrency(request.getCryptoCurrency())
                 .amountCrypto(cryptoPrice)
+                .requestId(requestId)
                 .wallet(activeWallet)
+                .billersCode(request.getServiceId())
                 .build();
-
-
+        transaction.setExpiresAt(LocalDateTime.now().plusHours(1));
 
         transactionRepository.save(transaction);
 
-
+        return transactionMapper.toPurchaseResponse(transaction);
     }
 
     private BigDecimal getCryptoPrice(BigDecimal amount, BigDecimal amountNaira) {

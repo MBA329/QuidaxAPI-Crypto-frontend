@@ -2,6 +2,8 @@ package com.codewithmosh.dryptoapi.services;
 
 import com.codewithmosh.dryptoapi.dtos.*;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -126,6 +128,41 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
             System.out.println(ex.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public void processWebhook(String rawPayload) {
+        try {
+            JsonObject root = JsonParser.parseString(rawPayload).getAsJsonObject();
+
+            String type = root.has("type") ? root.get("type").getAsString() : null;
+
+            if (!"transaction-update".equalsIgnoreCase(type)) {
+                System.out.println("Ignored webhook type: " + type);
+                return;
+            }
+
+            JsonObject content = root.getAsJsonObject("content");
+
+            String status = content.has("status") ? content.get("status").getAsString() : null;
+            String requestId = content.has("request_id") ? content.get("request_id").getAsString() : null;
+            String phone = content.has("phone") ? content.get("phone").getAsString() : null;
+            String amount = content.has("amount") ? content.get("amount").getAsString() : null;
+            String transactionId = content.has("transactionId") ? content.get("transactionId").getAsString() : null;
+
+            System.out.println("✅ VTPass Transaction Update Received");
+            System.out.println("Request ID: " + requestId);
+            System.out.println("Status: " + status);
+            System.out.println("Phone: " + phone);
+            System.out.println("Amount: " + amount);
+            System.out.println("Transaction ID: " + transactionId);
+
+            // TODO: Use requestId to find matching local transaction and update its status in your DB
+
+        } catch (Exception ex) {
+            System.out.println("❌ Error processing VTPass webhook:");
+            System.out.println(ex.getMessage());
+        }
     }
 }
 

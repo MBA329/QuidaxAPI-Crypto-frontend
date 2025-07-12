@@ -1,5 +1,6 @@
 package com.codewithmosh.dryptoapi.controllers;
 
+import com.codewithmosh.dryptoapi.dtos.BuyDataRequest;
 import com.codewithmosh.dryptoapi.dtos.TickerResponse;
 import com.codewithmosh.dryptoapi.dtos.VTPassPurchaseRequest;
 import com.codewithmosh.dryptoapi.services.CryptoPaymentGateway;
@@ -23,9 +24,25 @@ public class PurchaseController {
         return ResponseEntity.ok(price);
     }
 
-    @PostMapping("/fetch-plans")
-    public ResponseEntity<?> fetchDataPlans() {
-        var response = serviceGateway.getVariationCodes("airtel-data");
+    @PostMapping("/fetch-plans/{serviceProvider}")
+    public ResponseEntity<?> fetchDataPlans(@PathVariable("serviceProvider") String networkName) {
+        var response = serviceGateway.getVariationCodes(networkName.toLowerCase() + "-data");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/buy-data}")
+    public ResponseEntity<?> buyData(
+            @RequestBody VTPassPurchaseRequest request
+    ) {
+        var response = serviceGateway.purchaseProduct(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/verify/{request_id}")
+    public ResponseEntity<?> verifyPurchase(
+            @PathVariable("request_id") String requestId
+    ) {
+        var response = serviceGateway.fetchTransactionStatus(requestId);
         return ResponseEntity.ok(response);
     }
 
@@ -40,14 +57,6 @@ public class PurchaseController {
                 variationCode,
                 "08011111111");
         var response = serviceGateway.purchaseProduct(request);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/verify/{request_id}")
-    public ResponseEntity<?> verifyPurchase(
-            @PathVariable("request_id") String requestId
-    ) {
-        var response = serviceGateway.fetchTransactionStatus(requestId);
         return ResponseEntity.ok(response);
     }
 }

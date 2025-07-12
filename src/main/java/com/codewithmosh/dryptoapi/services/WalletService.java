@@ -1,19 +1,13 @@
 package com.codewithmosh.dryptoapi.services;
 
-import com.codewithmosh.dryptoapi.constants.CryptoCoin;
 import com.codewithmosh.dryptoapi.data.AppContext;
 import com.codewithmosh.dryptoapi.dtos.WalletResponse;
-import com.codewithmosh.dryptoapi.entities.Wallet;
 import com.codewithmosh.dryptoapi.exceptions.WalletNotFoundException;
 import com.codewithmosh.dryptoapi.mappers.WalletMapper;
 import com.codewithmosh.dryptoapi.repositories.WalletRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -24,25 +18,25 @@ public class WalletService {
     private final WalletMapper walletMapper;
 
 
-//    public void loadWallets() {
-//
-//        for (var i: AppContext.cryptos) {
-//            var wallet = paymentGateway.fetchPaymentAddresses(i);
-//            if (wallet == null) {
-//                throw new WalletNotFoundException();
-//            }
-//            for (var j : wallet.getWallets()) {
-//                var myWallet = walletMapper.toWallet(j);
-//                var walletExists = walletRepository.findById(myWallet.getId()).orElse(null);
-//                if (walletExists != null) {
-//                    continue;
-//                }
-//                walletRepository.save(myWallet);
-//            }
-//
-//        }
-//
-//    }
+    public void loadWallets() {
+
+        for (var i: AppContext.cryptos) {
+            var wallet = paymentGateway.fetchPaymentAddresses(i);
+            if (wallet == null) {
+                throw new WalletNotFoundException();
+            }
+            for (var j : wallet.getWallets()) {
+                var myWallet = walletMapper.toWallet(j);
+                var walletExists = walletRepository.findById(myWallet.getId()).orElse(null);
+                if (walletExists != null) {
+                    continue;
+                }
+                walletRepository.save(myWallet);
+            }
+
+        }
+
+    }
 
     @Transactional
     public void createWallets() {
@@ -69,7 +63,7 @@ public class WalletService {
 
 
     public WalletResponse getActiveWalletByCryptoCurrency(String cryptoCurrency) {
-        var wallet = walletRepository.findByCryptoCurrencyAndActiveTrue(cryptoCurrency).orElse(null);
+        var wallet = walletRepository.findByCryptoCurrencyAndActiveFalse(cryptoCurrency).orElse(null);
         if (wallet == null) {
             throw new WalletNotFoundException();
         }

@@ -10,4 +10,5 @@ public interface UtilityServiceGateway {
     NetworkContentDto getVariationCodes(String serviceId);
     VTPassPurchaseResponse purchaseProduct(VTPassPurchaseRequest request);
     VTPassQueryTransactionResponse fetchTransactionStatus(String requestId);
+    public void processWebhook(String rawPayload);
 }

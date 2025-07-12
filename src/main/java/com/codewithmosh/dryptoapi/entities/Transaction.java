@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "transactions")
 public class Transaction {
     @Id
@@ -23,6 +25,12 @@ public class Transaction {
     @Column(name = "network")
     private String network;
 
+    @Column(name = "service_id")
+    private String serviceId;
+
+    @Column(name = "billers_code")
+    private String billersCode;
+
     @Column(name = "data_plan_code")
     private String dataPlanCode;
 
@@ -35,9 +43,8 @@ public class Transaction {
     @Column(name = "crypto_currency")
     private String cryptoCurrency;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "wallet_id")
-    @Builder.Default
     private Wallet wallet;
 
     @Column(name = "transaction_status")

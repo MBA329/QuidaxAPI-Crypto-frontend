@@ -1,13 +1,20 @@
 package com.codewithmosh.dryptoapi.services;
 
 import com.codewithmosh.dryptoapi.dtos.*;
+import com.codewithmosh.dryptoapi.entities.TransactionStatus;
+import com.codewithmosh.dryptoapi.exceptions.TransactionNotFoundException;
+import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -17,12 +24,14 @@ import java.net.http.HttpResponse;
 @RequiredArgsConstructor
 public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
     private final RestTemplate restTemplate;
+    private final TransactionRepository transactionRepository;
 
     @Value("${quidax.baseUrl}")
     private String baseUrl;
 
     @Value("${quidax.secretKey}")
     private String apiKey;
+    private final UtilityServiceGateway serviceGateway;
 
     public TickerResponse getBuyPrice(String marketPair) {
         try {
@@ -118,14 +127,86 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
         }
         return null;
     }
-}
+    @Transactional
+    @Override
+    public void processWebhook(String rawPayload) {
+        try {
+            JsonObject root = JsonParser.parseString(rawPayload).getAsJsonObject();
+            String event = root.has("event") ? root.get("event").getAsString() : null;
 
-//String url = "http://api.assemblyai.com/v2/transcript/" + transcript.getId();
-//
-//HttpRequest getRequest = HttpRequest.newBuilder()
-//        .uri(new URI(url))
-//        .header("Authorization", "Your API Key")
-//        .GET()
-//        .build();
-//
-//HttpResponse<String> getResponse = httpClient.send(getRequest, BodyHandlers.ofString());
+            if ("deposit.successful".equalsIgnoreCase(event)) {
+                JsonObject data = root.getAsJsonObject("data");
+
+                String id = data.has("id") ? data.get("id").getAsString() : null;
+                String txid = data.has("txid") ? data.get("txid").getAsString() : null;
+                String currency = data.has("currency") ? data.get("currency").getAsString() : null;
+                BigDecimal amount = data.has("amount") ? data.get("amount").getAsBigDecimal() : BigDecimal.valueOf(0.0);
+
+                String depositAddress = null;
+                if (data.has("wallet")) {
+                    JsonObject wallet = data.getAsJsonObject("wallet");
+                    depositAddress = wallet.has("deposit_address") ? wallet.get("deposit_address").getAsString() : null;
+                }
+                var transaction = transactionRepository.findByWallet_DepositAddress(depositAddress).orElse(null);
+                if (transaction == null) {
+                    throw new TransactionNotFoundException();
+                }
+                if (amount.compareTo(transaction.getAmountCrypto()) >= 0) {
+                    transaction.setTransactionStatus(TransactionStatus.PAID);
+                    transaction.getWallet().setActive(false);
+                    transaction.setTransactionId(id);
+                    transaction.setTransactionHash(txid);
+                    transactionRepository.save(transaction);
+
+                    var response = serviceGateway.purchaseProduct(new VTPassPurchaseRequest(
+                            transaction.getRequestId(),
+                            transaction.getServiceId(),
+                            transaction.getBillersCode(),
+                            transaction.getDataPlanCode(),
+                            transaction.getPhoneNumber()
+
+                    ));
+                    System.out.println("in progress");
+                }
+//                System.out.println("✅ Quidax Deposit Successful");
+//                System.out.println("ID: " + id);
+//                System.out.println("TXID: " + txid);
+//                System.out.println("Currency: " + currency);
+//                System.out.println("Amount: " + amount);
+//                System.out.println("Deposit Address: " + depositAddress);
+
+                // TODO: use id, txid, currency, amount, depositAddress to verify and credit user
+            } else if ("wallet_address.generated".equalsIgnoreCase(event)) {
+                JsonObject data = root.getAsJsonObject("data");
+
+                String walletId = data.has("id") ? data.get("id").getAsString() : null;
+                String currency = data.has("currency") ? data.get("currency").getAsString() : null;
+                String network = data.has("network") ? data.get("network").getAsString() : null;
+                String depositAddress = data.has("deposit_address") ? data.get("deposit_address").getAsString() : null;
+
+                String userId = null;
+                String userEmail = null;
+
+                if (data.has("user")) {
+                    JsonObject user = data.getAsJsonObject("user");
+                    userId = user.has("id") ? user.get("id").getAsString() : null;
+                    userEmail = user.has("email") ? user.get("email").getAsString() : null;
+                }
+
+                System.out.println("✅ Wallet Address Generated");
+                System.out.println("Wallet ID: " + walletId);
+                System.out.println("Currency: " + currency);
+                System.out.println("Network: " + network);
+                System.out.println("Deposit Address: " + depositAddress);
+                System.out.println("User ID: " + userId);
+                System.out.println("User Email: " + userEmail);
+            } else {
+                System.out.println("Ignored event: " + event);
+            }
+        } catch (Exception ex) {
+            System.out.println("❌ Error processing webhook:");
+            System.out.println(ex.getMessage());
+        }
+    }
+
+}

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public class PurchaseResponse {
     private String dataPlanCode;
     private String depositAddress;
+    private String network;
     private String cryptoCurrency;
     private BigDecimal amountCrypto;
     private BigDecimal amountNaira;
