@@ -10,10 +10,16 @@ public class FetchWalletResponse {
 
     @Data
     public static class WalletData {
+        @SerializedName("id")
+        private String id;
+
         @SerializedName("currency")
-        private String currency;
+        private String cryptoCurrency;
 
         @SerializedName("address")
         private String depositAddress;
+
+        @SerializedName("address")
+        private String network;
     }
 }

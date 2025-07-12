@@ -15,8 +15,8 @@ import java.util.UUID;
 @Table(name = "wallets")
 public class Wallet {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
 
     @Column(name = "deposit_address")
     private String depositAddress;
@@ -24,9 +24,14 @@ public class Wallet {
     @Column(name = "crypto_currency")
     private String cryptoCurrency;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "network")
+    private String network;
+
+    @Column(name = "is_active")
+    private boolean isActive;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
 
     @OneToMany(mappedBy = "wallet")
     private Set<Transaction> transactions = new LinkedHashSet<>();

@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class MarketPair {
-    private String btcngn = "btcngn";
-    private String usdtngn = "usdtngn";
+    public static String btcngn = "btcngn";
+    public static String usdtngn = "usdtngn";
 }

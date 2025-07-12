@@ -3,6 +3,8 @@ package com.codewithmosh.dryptoapi.dtos;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class TickerResponse {
     @SerializedName("data")
@@ -17,12 +19,12 @@ public class TickerResponse {
     @Data
     public static class TickerData {
         @SerializedName("buy")
-        private String buy;
+        private BigDecimal buy;
 
         @SerializedName("sell")
-        private String sell;
+        private BigDecimal sell;
 
         @SerializedName("last")
-        private String last_price;
+        private BigDecimal last_price;
     }
 }

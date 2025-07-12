@@ -1,12 +1,12 @@
 package com.codewithmosh.dryptoapi.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Builder
 @Entity
 @Getter
 @Setter
@@ -37,6 +37,7 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "wallet_id")
+    @Builder.Default
     private Wallet wallet;
 
     @Column(name = "transaction_status")
@@ -59,6 +60,8 @@ public class Transaction {
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "expires_at", updatable = false)
+    private LocalDateTime expiresAt;
 //    @Column(name = ) //not needed, aim must be achieved
 //    private LocalDateTime priceLockedAt;
 }

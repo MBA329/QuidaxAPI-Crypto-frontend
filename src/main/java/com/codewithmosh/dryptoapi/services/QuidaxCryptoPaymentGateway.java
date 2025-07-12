@@ -1,7 +1,6 @@
 package com.codewithmosh.dryptoapi.services;
 
-import com.codewithmosh.dryptoapi.dtos.TickerResponse;
-import com.codewithmosh.dryptoapi.dtos.FetchWalletResponse;
+import com.codewithmosh.dryptoapi.dtos.*;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -72,9 +71,53 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
         return null;
     }
 
+    @Override
+    public FetchWalletsResponse fetchPaymentAddresses(String cryptoCurrency) {
+        try {
+            String url = baseUrl + "/users/me/wallets/" + cryptoCurrency.toLowerCase() + "/addressess";  // e.g. usdtngn
 
+            HttpRequest getRequest = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .GET()
+                    .build();
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpResponse<String> getResponse = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
+            Gson gson = new Gson();
+            var response = gson.fromJson(getResponse.body(), FetchWalletsResponse.class);
+            return response;
+        }
+        catch (Exception ex) {
+            System.out.println("Error: Failed to fetch Quidax wallet details for wallet.");
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
 
+    @Override
+    public FetchWalletResponse createPaymentAddress(String cryptoCurrency) {
+        try {
+            String url = baseUrl + "/users/me/wallets/" + cryptoCurrency.toLowerCase() + "/addresses";  // e.g. usdtngn
+            var request = new CreatePaymentAddressRequest("me", cryptoCurrency.toLowerCase());
+            Gson gson = new Gson();
+            String jsonRequest = gson.toJson(request);
+            HttpRequest postRequest = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonRequest))
+                    .build();
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpResponse<String> getResponse = httpClient.send(postRequest, HttpResponse.BodyHandlers.ofString());
 
+            var response = gson.fromJson(getResponse.body(), FetchWalletResponse.class);
+            return response;
+        }
+        catch (Exception ex) {
+            System.out.println("Error: Failed to create Quidax wallet for user.");
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
 }
 
 //String url = "http://api.assemblyai.com/v2/transcript/" + transcript.getId();
