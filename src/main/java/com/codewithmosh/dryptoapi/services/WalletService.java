@@ -7,7 +7,10 @@ import com.codewithmosh.dryptoapi.mappers.WalletMapper;
 import com.codewithmosh.dryptoapi.repositories.WalletRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Service
@@ -69,14 +72,13 @@ public class WalletService {
         }
         return walletMapper.toWalletResponse(wallet);
     }
+    @Scheduled(cron = "0 0 * * * *") // every hour
+    public void deactivateExpiredWallets() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime cutoff = now.minusMinutes(30);
 
-//
-//    public WalletResponse createWallet(WalletRequest request) {
-//
-//    }
-//
-//    public List<WalletResponse> getAllWallets() {
-//
-//    }
+        int updated = walletRepository.deactivateWalletsWithExpiredTransactions(cutoff);
+        System.out.println("✅ Deactivated " + updated + " wallet(s) with expired transactions.");
+    }
 
 }

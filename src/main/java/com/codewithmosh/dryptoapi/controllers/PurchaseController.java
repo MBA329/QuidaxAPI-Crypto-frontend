@@ -1,6 +1,5 @@
 package com.codewithmosh.dryptoapi.controllers;
 
-import com.codewithmosh.dryptoapi.dtos.BuyDataRequest;
 import com.codewithmosh.dryptoapi.dtos.TickerResponse;
 import com.codewithmosh.dryptoapi.dtos.VTPassPurchaseRequest;
 import com.codewithmosh.dryptoapi.services.CryptoPaymentGateway;

@@ -33,6 +33,7 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
     private static ZoneId LAGOS_ZONE = ZoneId.of("Africa/Lagos");
     private static DateTimeFormatter REQUEST_ID_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
+    @Override
     public String generateRequestId() {
         // Step 1: Get current datetime in Africa/Lagos
         LocalDateTime nowInLagos = LocalDateTime.now(LAGOS_ZONE);
@@ -46,7 +47,7 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
         // Final request_id
         return timePart + randomPart;
     }
-
+    @Override
     public NetworkContentDto getVariationCodes(String serviceId) {
         try {
             String url = baseUrl + "/service-variations?serviceID=" + serviceId;  // e.g. usdtngn
@@ -71,7 +72,7 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
         }
         return null;
     }
-
+    @Override
     public VTPassPurchaseResponse purchaseProduct(VTPassPurchaseRequest request) {
         try {
             String url = baseUrl + "/pay";
@@ -99,7 +100,7 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
         }
         return null;
     }
-
+    @Override
     public VTPassQueryTransactionResponse fetchTransactionStatus(String requestId) {
         try {
             String url = baseUrl + "/requery";  // e.g. usdtngn

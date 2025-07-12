@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -151,6 +152,12 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
                 if (transaction == null) {
                     throw new TransactionNotFoundException();
                 }
+
+                if (transaction.getExpiresAt() != null && transaction.getExpiresAt().isBefore(LocalDateTime.now())) {
+                    System.out.println("Transaction expired");
+                    return;
+                }
+
                 if (amount.compareTo(transaction.getAmountCrypto()) >= 0) {
                     transaction.setTransactionStatus(TransactionStatus.PAID);
                     transaction.getWallet().setActive(false);

@@ -1,44 +1,32 @@
-create table users
-(
-    id       binary(16) default (uuid_to_bin(uuid())) not null
-        primary key,
-    email    varchar(50)                            not null,
-    password varchar(255)                           not null
+CREATE TABLE wallets (
+     id              VARCHAR(36) NOT NULL PRIMARY KEY,  -- matches `private String id;`
+     deposit_address VARCHAR(50) NOT NULL,
+     crypto_currency VARCHAR(25) NOT NULL,
+     network         VARCHAR(20) NOT NULL ,
+     is_active       BOOLEAN DEFAULT TRUE
 );
 
-create table wallets
-(
-    id              binary(16) default (uuid_to_bin(uuid())) not null
-        primary key,
-    deposit_address varchar(50)                            not null,
-    crypto_currency varchar(15)                            not null,
-    user_id         binary(16)                             not null,
-    constraint wallets_users_id_fk
-        foreign key (user_id) references users (id)
+CREATE TABLE transactions (
+      id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+      phone_number       VARCHAR(15) NOT NULL,
+      network            VARCHAR(20) NOT NULL,
+      service_id         VARCHAR(30) NOT NULL,                      -- new
+      billers_code       VARCHAR(30) NOT NULL,                      -- new
+      data_plan_code     VARCHAR(25) NOT NULL,
+      amount_naira       DECIMAL(10, 2) NOT NULL,
+      amount_crypto      DECIMAL(20, 8) NOT NULL,
+      crypto_currency    VARCHAR(25) NOT NULL,
+      wallet_id          VARCHAR(36) NOT NULL,
+      transaction_status VARCHAR(20) NOT NULL,
+      delivery_status    VARCHAR(20) NOT NULL,
+      request_id         VARCHAR(50) NOT NULL,                      -- from VTPass
+      transaction_hash   VARCHAR(100),                     -- from Quidax
+      transaction_id     VARCHAR(50),                      -- from Quidax
+      created_at         DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+      expires_at         DATETIME NOT NULL,                         -- new
+      CONSTRAINT transactions_wallets_id_fk
+          FOREIGN KEY (wallet_id) REFERENCES wallets(id)
 );
-
-create table transactions
-(
-    id                 bigint auto_increment
-        primary key,
-    phone_number       varchar(15)                            not null,
-    network            varchar(10)                            not null,
-    data_plan_code     varchar(25)                            not null,
-    amount_naira       decimal(10, 2)                         not null,
-    amount_crypto      decimal(10, 2)                         not null,
-    crypto_currency    varchar(25)                            not null,
-    wallet_id          binary(16)                             not null,
-    transaction_status varchar(15)                            not null,
-    delivery_status    varchar(15)                            not null,
-    request_id         varchar(30)                            not null,
-    transaction_hash   varchar(50)                            null,
-    transaction_id     varchar(30)                            null,
-    created_at         datetime   default current_timestamp() not null,
-    constraint transactions_wallets_id_fk
-        foreign key (wallet_id) references wallets (id)
-);
-
-
 
 
 

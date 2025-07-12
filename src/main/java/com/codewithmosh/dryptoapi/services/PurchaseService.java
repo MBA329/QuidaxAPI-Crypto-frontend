@@ -2,7 +2,9 @@ package com.codewithmosh.dryptoapi.services;
 
 import com.codewithmosh.dryptoapi.dtos.PurchaseRequest;
 import com.codewithmosh.dryptoapi.dtos.PurchaseResponse;
+import com.codewithmosh.dryptoapi.entities.DeliveryStatus;
 import com.codewithmosh.dryptoapi.entities.Transaction;
+import com.codewithmosh.dryptoapi.entities.TransactionStatus;
 import com.codewithmosh.dryptoapi.exceptions.NoActiveWalletException;
 import com.codewithmosh.dryptoapi.mappers.TransactionMapper;
 import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
@@ -42,8 +44,11 @@ public class PurchaseService {
                 .amountCrypto(cryptoPrice)
                 .requestId(requestId)
                 .wallet(activeWallet)
+                .deliveryStatus(DeliveryStatus.PENDING)
+                .transactionStatus(TransactionStatus.PENDING)
                 .billersCode(request.getServiceId())
                 .build();
+
         transaction.setExpiresAt(LocalDateTime.now().plusHours(1));
 
         transactionRepository.save(transaction);
