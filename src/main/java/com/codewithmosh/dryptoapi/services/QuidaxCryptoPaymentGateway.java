@@ -4,7 +4,9 @@ import com.codewithmosh.dryptoapi.dtos.*;
 import com.codewithmosh.dryptoapi.entities.TransactionStatus;
 import com.codewithmosh.dryptoapi.entities.Wallet;
 import com.codewithmosh.dryptoapi.exceptions.TransactionNotFoundException;
+import com.codewithmosh.dryptoapi.mappers.WalletMapper;
 import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
+import com.codewithmosh.dryptoapi.repositories.WalletRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -27,7 +29,8 @@ import java.time.LocalDateTime;
 public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
     private final RestTemplate restTemplate;
     private final TransactionRepository transactionRepository;
-    private final WalletService walletService;
+    private final WalletRepository walletRepository;
+    private final WalletMapper walletMapper;
 
     @Value("${quidax.baseUrl}")
     private String baseUrl;
@@ -185,20 +188,21 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
 //                System.out.println("Deposit Address: " + depositAddress);
 
                 // TODO: use id, txid, currency, amount, depositAddress to verify and credit user
-            } else if ("wallet_address.generated".equalsIgnoreCase(event)) {
+            } else if ("wallet.address.generated".equalsIgnoreCase(event)) {
                 JsonObject data = root.getAsJsonObject("data");
 
                 String walletId = data.has("id") ? data.get("id").getAsString() : null;
                 String currency = data.has("currency") ? data.get("currency").getAsString() : null;
                 String network = data.has("network") ? data.get("network").getAsString() : null;
-                String depositAddress = data.has("deposit_address") ? data.get("deposit_address").getAsString() : null;
+                String depositAddress = data.has("address") ? data.get("address").getAsString() : null;
                 var wallet = new FetchWalletResponse();
                 wallet.setId(walletId);
                 wallet.setCryptoCurrency(currency);
                 wallet.setDepositAddress(depositAddress);
                 wallet.setNetwork(network);
 
-                walletService.createWallet(wallet);
+                createWallet(wallet);
+
                 String userId = null;
                 String userEmail = null;
 
@@ -223,5 +227,11 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
             System.out.println(ex.getMessage());
         }
     }
+
+    public void createWallet(FetchWalletResponse walletRequest) {
+        var wallet = walletMapper.toWallet(walletRequest);
+        walletRepository.save(wallet);
+    }
+
 
 }

@@ -50,9 +50,9 @@ public class WalletService {
                 continue;
             }
             var count = addresses.getWallets().size();
-
-            if (count < 10) {
-                for (int j = count + 1; j <= 10; j++) {
+            int limit = 13;
+            if (count < limit) {
+                for (int j = count + 1; j <= limit; j++) {
 //                    var wallet = walletMapper.toWallet(paymentGateway.createPaymentAddress(i));
 //                    walletRepository.save(wallet);
                     paymentGateway.createPaymentAddress(i);
@@ -85,8 +85,8 @@ public class WalletService {
         System.out.println("✅ Deactivated " + updated + " wallet(s) with expired transactions.");
     }
 
-    public void createWallet(FetchWalletResponse walletRequest) {
-        var wallet = walletMapper.toWallet(walletRequest);
-        walletRepository.save(wallet);
-    }
+//    public void createWallet(FetchWalletResponse walletRequest) {
+//        var wallet = walletMapper.toWallet(walletRequest);
+//        walletRepository.save(wallet);
+//    }
 }

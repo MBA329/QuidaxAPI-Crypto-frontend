@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/webhook")
@@ -37,7 +38,7 @@ public class WebhookController {
 
 
     @PostMapping("/vtpass")
-    public ResponseEntity<String> handleVTPassWebhook(HttpServletRequest request) throws IOException {
+    public Map<String, String> handleVTPassWebhook(HttpServletRequest request) throws IOException {
         StringBuilder jsonBuilder = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {
             String line;
@@ -48,7 +49,7 @@ public class WebhookController {
         String rawPayload = jsonBuilder.toString();
         serviceGateway.processWebhook(rawPayload);
 
-        return ResponseEntity.ok("VTPass webhook received");
+        return Map.of("response", "success");
     }
 
 }

@@ -1,11 +1,15 @@
 package com.codewithmosh.dryptoapi.services;
 
 import com.codewithmosh.dryptoapi.dtos.*;
+import com.codewithmosh.dryptoapi.entities.DeliveryStatus;
+import com.codewithmosh.dryptoapi.exceptions.TransactionNotFoundException;
+import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,6 +22,7 @@ import java.util.UUID;
 
 @Service
 public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
+    private final TransactionRepository transactionRepository;
     @Value("${vtpass.staticKey}")
     private String staticApiKey;
 
@@ -32,6 +37,10 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
 
     private static ZoneId LAGOS_ZONE = ZoneId.of("Africa/Lagos");
     private static DateTimeFormatter REQUEST_ID_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+
+    public VTPassUtilityServiceGateway(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
 
     @Override
     public String generateRequestId() {
@@ -131,25 +140,32 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
         return null;
     }
 
+    @Transactional
     @Override
     public void processWebhook(String rawPayload) {
         try {
             JsonObject root = JsonParser.parseString(rawPayload).getAsJsonObject();
 
             String type = root.has("type") ? root.get("type").getAsString() : null;
-
             if (!"transaction-update".equalsIgnoreCase(type)) {
                 System.out.println("Ignored webhook type: " + type);
                 return;
             }
 
-            JsonObject content = root.getAsJsonObject("content");
+            JsonObject data = root.getAsJsonObject("data");
+            if (data == null) {
+                System.out.println("Missing 'data' object in webhook");
+                return;
+            }
 
-            String status = content.has("status") ? content.get("status").getAsString() : null;
-            String requestId = content.has("request_id") ? content.get("request_id").getAsString() : null;
-            String phone = content.has("phone") ? content.get("phone").getAsString() : null;
-            String amount = content.has("amount") ? content.get("amount").getAsString() : null;
-            String transactionId = content.has("transactionId") ? content.get("transactionId").getAsString() : null;
+            JsonObject content = data.getAsJsonObject("content");
+            JsonObject transaction = content.getAsJsonObject("transactions");
+
+            String status = transaction.has("status") ? transaction.get("status").getAsString() : null;
+            String requestId = data.has("requestId") ? data.get("requestId").getAsString() : null;
+            String phone = transaction.has("phone") ? transaction.get("phone").getAsString() : null;
+            Double amount = transaction.has("amount") ? transaction.get("amount").getAsDouble() : null;
+            String transactionId = transaction.has("transactionId") ? transaction.get("transactionId").getAsString() : null;
 
             System.out.println("✅ VTPass Transaction Update Received");
             System.out.println("Request ID: " + requestId);
@@ -158,13 +174,23 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
             System.out.println("Amount: " + amount);
             System.out.println("Transaction ID: " + transactionId);
 
-            // TODO: Use requestId to find matching local transaction and update its status in your DB
+            // TODO: Use requestId to locate your local DB record and update its status
 
+            var existingTransaction = transactionRepository.findByRequestId(requestId).orElse(null);
+
+            if (existingTransaction == null) {
+                throw new TransactionNotFoundException();
+            }
+            existingTransaction.setDeliveryStatus(DeliveryStatus.DELIVERED);
+            existingTransaction.getWallet().setActive(false);
+
+            transactionRepository.save(existingTransaction); //touch grass
         } catch (Exception ex) {
             System.out.println("❌ Error processing VTPass webhook:");
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
     }
+
 }
 
 
