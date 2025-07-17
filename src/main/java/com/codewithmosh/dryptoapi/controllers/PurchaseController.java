@@ -29,7 +29,7 @@ public class PurchaseController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/buy-data}")
+    @PostMapping("/buy-data")
     public ResponseEntity<?> buyData(
             @RequestBody VTPassPurchaseRequest request
     ) {

@@ -12,8 +12,8 @@ public class MessageController {
     private final WalletService walletService;
     @RequestMapping("/hello")
     public String sayHello() {
-        walletService.loadWallets();
-        walletService.createWallets();
+//        walletService.loadWallets();
+//        walletService.createWallets();
         return "Hello, world!";
     }
 }

@@ -1,6 +1,7 @@
 package com.codewithmosh.dryptoapi.services;
 
 import com.codewithmosh.dryptoapi.data.AppContext;
+import com.codewithmosh.dryptoapi.dtos.FetchWalletResponse;
 import com.codewithmosh.dryptoapi.dtos.WalletResponse;
 import com.codewithmosh.dryptoapi.exceptions.WalletNotFoundException;
 import com.codewithmosh.dryptoapi.mappers.WalletMapper;
@@ -26,7 +27,7 @@ public class WalletService {
         for (var i: AppContext.cryptos) {
             var wallet = paymentGateway.fetchPaymentAddresses(i);
             if (wallet == null) {
-                throw new WalletNotFoundException();
+                continue;
             }
             for (var j : wallet.getWallets()) {
                 var myWallet = walletMapper.toWallet(j);
@@ -44,14 +45,17 @@ public class WalletService {
     @Transactional
     public void createWallets() {
         for (var i: AppContext.cryptos) {
-            var count = paymentGateway.fetchPaymentAddresses(i).getWallets().size();
-            if (count >= 10) {
+            var addresses = paymentGateway.fetchPaymentAddresses(i);
+            if (addresses == null) {
                 continue;
             }
-            else {
+            var count = addresses.getWallets().size();
+
+            if (count < 10) {
                 for (int j = count + 1; j <= 10; j++) {
-                    var wallet = walletMapper.toWallet(paymentGateway.createPaymentAddress(i));
-                    walletRepository.save(wallet);
+//                    var wallet = walletMapper.toWallet(paymentGateway.createPaymentAddress(i));
+//                    walletRepository.save(wallet);
+                    paymentGateway.createPaymentAddress(i);
                 }
             }
 
@@ -66,7 +70,7 @@ public class WalletService {
 
 
     public WalletResponse getActiveWalletByCryptoCurrency(String cryptoCurrency) {
-        var wallet = walletRepository.findByCryptoCurrencyAndActiveFalse(cryptoCurrency).orElse(null);
+        var wallet = walletRepository.findByCryptoCurrencyAndIsActiveFalse(cryptoCurrency).orElse(null);
         if (wallet == null) {
             throw new WalletNotFoundException();
         }
@@ -81,4 +85,8 @@ public class WalletService {
         System.out.println("✅ Deactivated " + updated + " wallet(s) with expired transactions.");
     }
 
+    public void createWallet(FetchWalletResponse walletRequest) {
+        var wallet = walletMapper.toWallet(walletRequest);
+        walletRepository.save(wallet);
+    }
 }

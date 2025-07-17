@@ -10,9 +10,9 @@ import org.mapstruct.Mapping;
 public interface WalletMapper {
     WalletResponse toWalletResponse(Wallet wallet);
 
-    @Mapping(source = "data.cryptoCurrency", target = "cryptoCurrency")
-    @Mapping(source = "data.depositAddress", target = "depositAddress")
-    @Mapping(source = "data.network", target = "network")
-    @Mapping(source = "data.id", target = "id")
+    @Mapping(source = "cryptoCurrency", target = "cryptoCurrency")
+    @Mapping(source = "depositAddress", target = "depositAddress")
+    @Mapping(source = "network", target = "network")
+    @Mapping(source = "id", target = "id")
     Wallet toWallet(FetchWalletResponse fetchWalletResponse);
 }

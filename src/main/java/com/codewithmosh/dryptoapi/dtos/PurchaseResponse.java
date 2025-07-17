@@ -1,7 +1,9 @@
 package com.codewithmosh.dryptoapi.dtos;
 
-import java.math.BigDecimal;
+import lombok.Data;
 
+import java.math.BigDecimal;
+@Data
 public class PurchaseResponse {
     private String dataPlanCode;
     private String depositAddress;

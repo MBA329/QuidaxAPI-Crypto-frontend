@@ -28,7 +28,7 @@ public class PurchaseService {
 
     @Transactional
     public PurchaseResponse makeDataPurchase(PurchaseRequest request) {
-        var activeWallet = walletRepository.findByCryptoCurrencyAndActiveFalse(request.getCryptoCurrency())
+        var activeWallet = walletRepository.findByCryptoCurrencyAndIsActiveFalse(request.getCryptoCurrency())
                 .orElseThrow(NoActiveWalletException::new);
         var marketRate = paymentGateway.getBuyPrice(request.getCryptoCurrency().toLowerCase() + "ngn");
         var cryptoPrice = getCryptoPrice(marketRate.getData().getTicker().getBuy(), request.getAmountNaira());

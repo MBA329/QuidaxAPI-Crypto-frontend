@@ -1,5 +1,6 @@
 package com.codewithmosh.dryptoapi;
 
+import com.codewithmosh.dryptoapi.services.WalletService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -9,7 +10,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class DryptoApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DryptoApiApplication.class, args);
+        var context = SpringApplication.run(DryptoApiApplication.class, args);
+
+        var walletService = context.getBean(WalletService.class);
+        walletService.loadWallets();
+        walletService.createWallets();
 
 //        var user = context.getBean(User.class);
 

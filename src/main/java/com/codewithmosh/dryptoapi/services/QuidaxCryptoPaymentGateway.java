@@ -2,6 +2,7 @@ package com.codewithmosh.dryptoapi.services;
 
 import com.codewithmosh.dryptoapi.dtos.*;
 import com.codewithmosh.dryptoapi.entities.TransactionStatus;
+import com.codewithmosh.dryptoapi.entities.Wallet;
 import com.codewithmosh.dryptoapi.exceptions.TransactionNotFoundException;
 import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
 import com.google.gson.Gson;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
     private final RestTemplate restTemplate;
     private final TransactionRepository transactionRepository;
+    private final WalletService walletService;
 
     @Value("${quidax.baseUrl}")
     private String baseUrl;
@@ -84,7 +86,7 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
     @Override
     public FetchWalletsResponse fetchPaymentAddresses(String cryptoCurrency) {
         try {
-            String url = baseUrl + "/users/me/wallets/" + cryptoCurrency.toLowerCase() + "/addressess";  // e.g. usdtngn
+            String url = baseUrl + "/users/me/wallets/" + cryptoCurrency.toLowerCase() + "/addresses";  // e.g. usdtngn
 
             HttpRequest getRequest = HttpRequest.newBuilder()
                     .uri(new URI(url))
@@ -190,7 +192,13 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
                 String currency = data.has("currency") ? data.get("currency").getAsString() : null;
                 String network = data.has("network") ? data.get("network").getAsString() : null;
                 String depositAddress = data.has("deposit_address") ? data.get("deposit_address").getAsString() : null;
+                var wallet = new FetchWalletResponse();
+                wallet.setId(walletId);
+                wallet.setCryptoCurrency(currency);
+                wallet.setDepositAddress(depositAddress);
+                wallet.setNetwork(network);
 
+                walletService.createWallet(wallet);
                 String userId = null;
                 String userEmail = null;
 
