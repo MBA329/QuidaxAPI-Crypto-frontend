@@ -13,4 +13,5 @@ public class PurchaseResponse {
     private BigDecimal amountNaira;
     private String requestId;
     private String phoneNumber;
+    private String expiresAt; //added this
 }
