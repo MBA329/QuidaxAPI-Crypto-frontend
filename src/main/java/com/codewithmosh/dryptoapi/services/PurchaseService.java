@@ -6,6 +6,7 @@ import com.codewithmosh.dryptoapi.entities.DeliveryStatus;
 import com.codewithmosh.dryptoapi.entities.Transaction;
 import com.codewithmosh.dryptoapi.entities.TransactionStatus;
 import com.codewithmosh.dryptoapi.exceptions.NoActiveWalletException;
+import com.codewithmosh.dryptoapi.exceptions.WalletNotFoundException;
 import com.codewithmosh.dryptoapi.mappers.TransactionMapper;
 import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
 import com.codewithmosh.dryptoapi.repositories.WalletRepository;
@@ -28,25 +29,40 @@ public class PurchaseService {
 
     @Transactional
     public PurchaseResponse makeDataPurchase(PurchaseRequest request) {
-        var activeWallet = walletRepository.findByCryptoCurrencyAndIsActiveFalse(request.getCryptoCurrency())
-                .orElseThrow(NoActiveWalletException::new);
+        var activeWallets = walletRepository.findByCryptoCurrencyAndIsActiveFalse(request.getCryptoCurrency());
+        if (activeWallets.isEmpty()) {
+            throw new WalletNotFoundException();
+        }
+        var activeWallet = activeWallets.get(0);
+//                .orElseThrow(NoActiveWalletException::new);
+
         var marketRate = paymentGateway.getBuyPrice(request.getCryptoCurrency().toLowerCase() + "ngn");
-        var cryptoPrice = getCryptoPrice(marketRate.getData().getTicker().getBuy(), request.getAmountNaira());
-        activeWallet.setActive(false);
+
+        var serviceId = request.getNetwork().toLowerCase() + "-data";
+        var amountNaira = serviceGateway.getAmountNaira(request.getDataPlanCode(), serviceId);
+        if (amountNaira == null)
+        {
+            return null;
+        }
+        var cryptoPrice = getCryptoPrice(marketRate.getData().getTicker().getBuy(), amountNaira);
+        activeWallet.setActive(true);
+
+//        walletRepository.save(activeWallet);
         var requestId = serviceGateway.generateRequestId();
 
         var transaction = Transaction.builder()
                 .phoneNumber(request.getPhoneNumber())
                 .network(request.getNetwork())
                 .dataPlanCode(request.getDataPlanCode())
-                .amountNaira(request.getAmountNaira())
+                .amountNaira(amountNaira)
                 .cryptoCurrency(request.getCryptoCurrency())
                 .amountCrypto(cryptoPrice)
+                .serviceId(serviceId)
                 .requestId(requestId)
                 .wallet(activeWallet)
                 .deliveryStatus(DeliveryStatus.PENDING)
                 .transactionStatus(TransactionStatus.PENDING)
-                .billersCode(request.getServiceId())
+                .billersCode(request.getBillersCode())
                 .build();
 
         transaction.setExpiresAt(LocalDateTime.now().plusHours(1));
@@ -56,9 +72,10 @@ public class PurchaseService {
         return transactionMapper.toPurchaseResponse(transaction);
     }
 
-    private BigDecimal getCryptoPrice(BigDecimal amount, BigDecimal amountNaira) {
-        amount = amount.add(amount.multiply(BigDecimal.valueOf(0.01)));
-        return amount.divide(amountNaira, 2, RoundingMode.CEILING);
+    private BigDecimal getCryptoPrice(BigDecimal cryptoBuyPrice, BigDecimal amountNaira) {
+        cryptoBuyPrice = cryptoBuyPrice.add(cryptoBuyPrice.multiply(BigDecimal.valueOf(0.01)));
+        return amountNaira.divide(cryptoBuyPrice, 8, RoundingMode.CEILING);
     }
-
+//1btv = 200ngn
+//    x = 50k0ngng
 }

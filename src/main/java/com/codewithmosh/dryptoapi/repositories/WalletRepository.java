@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface WalletRepository extends CrudRepository<Wallet, String> {
 
     Optional<Wallet> findByCryptoCurrency(String cryptoCurrency);
-    Optional<Wallet> findByCryptoCurrencyAndIsActiveFalse(String cryptoCurrency);
+    List<Wallet> findByCryptoCurrencyAndIsActiveFalse(String cryptoCurrency);
 //    List<Wallet> findAllByCryptoCurrencyAndActive(String cryptoCurrency, boolean active);
 
     @Modifying

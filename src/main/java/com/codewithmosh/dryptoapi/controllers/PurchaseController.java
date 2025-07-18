@@ -1,8 +1,10 @@
 package com.codewithmosh.dryptoapi.controllers;
 
+import com.codewithmosh.dryptoapi.dtos.PurchaseRequest;
 import com.codewithmosh.dryptoapi.dtos.TickerResponse;
 import com.codewithmosh.dryptoapi.dtos.VTPassPurchaseRequest;
 import com.codewithmosh.dryptoapi.services.CryptoPaymentGateway;
+import com.codewithmosh.dryptoapi.services.PurchaseService;
 import com.codewithmosh.dryptoapi.services.UtilityServiceGateway;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class PurchaseController {
     private final CryptoPaymentGateway paymentGateway;
     private final UtilityServiceGateway serviceGateway;
+    private final PurchaseService purchaseService;
 
     @GetMapping("/buy-price/{market_pair}")
     public ResponseEntity<TickerResponse> getBuyPrice(
@@ -31,9 +34,9 @@ public class PurchaseController {
 
     @PostMapping("/buy-data")
     public ResponseEntity<?> buyData(
-            @RequestBody VTPassPurchaseRequest request
+            @RequestBody PurchaseRequest request
     ) {
-        var response = serviceGateway.purchaseProduct(request);
+        var response = purchaseService.makeDataPurchase(request);
         return ResponseEntity.ok(response);
     }
 

@@ -70,10 +70,11 @@ public class WalletService {
 
 
     public WalletResponse getActiveWalletByCryptoCurrency(String cryptoCurrency) {
-        var wallet = walletRepository.findByCryptoCurrencyAndIsActiveFalse(cryptoCurrency).orElse(null);
-        if (wallet == null) {
+        var wallets = walletRepository.findByCryptoCurrencyAndIsActiveFalse(cryptoCurrency);
+        if (wallets.isEmpty()) {
             throw new WalletNotFoundException();
         }
+        var wallet = wallets.get(0);
         return walletMapper.toWalletResponse(wallet);
     }
     @Scheduled(cron = "0 0 * * * *") // every hour

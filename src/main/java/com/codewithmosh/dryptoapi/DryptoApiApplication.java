@@ -13,8 +13,8 @@ public class DryptoApiApplication {
         var context = SpringApplication.run(DryptoApiApplication.class, args);
 
         var walletService = context.getBean(WalletService.class);
-        walletService.loadWallets();
-        walletService.createWallets();
+//        walletService.loadWallets();
+//        walletService.createWallets(); //they have performed
 
 //        var user = context.getBean(User.class);
 

@@ -11,13 +11,11 @@ public class PurchaseRequest {
 
     private String network;
 
-    private String serviceId;
-
     private String billersCode;
 
     private String dataPlanCode;
 
-    private BigDecimal amountNaira;
+//    private BigDecimal amountNaira;
 
     private String cryptoCurrency;
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -81,6 +82,17 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
         }
         return null;
     }
+
+    @Override
+    public BigDecimal getAmountNaira(String variationCode, String serviceId) {
+        var variationCodes = getVariationCodes(serviceId);
+
+        var code = variationCodes.getVariations()
+                .stream().filter(z -> z.getVariationCode().equals(variationCode))
+                .toList();
+        return new BigDecimal(code.get(0).getVariationAmount());
+    }
+
     @Override
     public VTPassPurchaseResponse purchaseProduct(VTPassPurchaseRequest request) {
         try {
