@@ -77,14 +77,14 @@ public class WalletService {
         var wallet = wallets.get(0);
         return walletMapper.toWalletResponse(wallet);
     }
-    @Scheduled(cron = "0 0 * * * *") // every hour
+    @Scheduled(cron = "0 */5 * * * *") // every 5 minutes
     public void deactivateExpiredWallets() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime cutoff = now.minusMinutes(30);
 
-        int updated = walletRepository.deactivateWalletsWithExpiredTransactions(cutoff);
+        int updated = walletRepository.deactivateWalletsWithExpiredTransactions(now);
         System.out.println("✅ Deactivated " + updated + " wallet(s) with expired transactions.");
     }
+
 
 //    public void createWallet(FetchWalletResponse walletRequest) {
 //        var wallet = walletMapper.toWallet(walletRequest);

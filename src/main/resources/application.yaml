@@ -17,4 +17,4 @@ vtpass:
   secretKey: ${VTPASS_SECRET_KEY}
   publicKey: ${VTPASS_PUBLIC_KEY}
   staticKey: ${VTPASS_STATIC_API_KEY}
-  baseUrl: https://sandbox.vtpass.com/api
+  baseUrl: https://sandbox.vtpass.com/api  #https://vtpass.com/api/
