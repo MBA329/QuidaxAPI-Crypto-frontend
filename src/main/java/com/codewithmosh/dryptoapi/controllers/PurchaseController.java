@@ -1,5 +1,6 @@
 package com.codewithmosh.dryptoapi.controllers;
 
+import com.codewithmosh.dryptoapi.data.AppContext;
 import com.codewithmosh.dryptoapi.dtos.PurchaseRequest;
 import com.codewithmosh.dryptoapi.dtos.TickerResponse;
 import com.codewithmosh.dryptoapi.dtos.VTPassPurchaseRequest;
@@ -9,6 +10,8 @@ import com.codewithmosh.dryptoapi.services.UtilityServiceGateway;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/purchase")
@@ -50,15 +53,26 @@ public class PurchaseController {
 
     @PostMapping("/buy-data/{variation_code}")
     public ResponseEntity<?> buyData(
-            @PathVariable("variation_code") String variationCode
+            @PathVariable("variation_code") String variationCode,
+            @RequestBody String networkProvider
     ) {
         var request = new VTPassPurchaseRequest(
                 serviceGateway.generateRequestId(),
-                "airtel-data",
+                networkProvider + "-data",
                 "09079275768",
                 variationCode,
                 "08011111111");
         var response = serviceGateway.purchaseProduct(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/networks")
+    public List<String> getAvailableNetworks() {
+        return AppContext.networks;
+    }
+
+    @GetMapping("/crypto-currencies")
+    public List<String> getAvailableCryptoCoins() {
+        return AppContext.cryptos;
     }
 }
