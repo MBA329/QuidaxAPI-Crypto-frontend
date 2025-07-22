@@ -140,7 +140,7 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
             JsonObject root = JsonParser.parseString(rawPayload).getAsJsonObject();
             String event = root.has("event") ? root.get("event").getAsString() : null;
 
-            if ("deposit.successful".equalsIgnoreCase(event)) {
+            if ("deposit.transaction.confirmation".equalsIgnoreCase(event)) {
                 JsonObject data = root.getAsJsonObject("data");
 
                 String id = data.has("id") ? data.get("id").getAsString() : null;
@@ -153,7 +153,7 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
                     JsonObject wallet = data.getAsJsonObject("wallet");
                     depositAddress = wallet.has("deposit_address") ? wallet.get("deposit_address").getAsString() : null;
                 }
-                var transaction = transactionRepository.findByWallet_DepositAddress(depositAddress).orElse(null);
+                var transaction = transactionRepository.findByWalletDepositAddress(depositAddress).orElse(null);
                 if (transaction == null) {
                     throw new TransactionNotFoundException();
                 }
