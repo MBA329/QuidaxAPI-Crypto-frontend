@@ -63,6 +63,7 @@ public class PurchaseService {
                 .deliveryStatus(DeliveryStatus.PENDING)
                 .transactionStatus(TransactionStatus.PENDING)
                 .billersCode(request.getBillersCode())
+                .isTerminated(false)
                 .build();
 
         transaction.setExpiresAt(LocalDateTime.now().plusHours(1));

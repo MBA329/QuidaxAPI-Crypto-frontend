@@ -5,6 +5,7 @@ import com.codewithmosh.dryptoapi.dtos.FetchWalletResponse;
 import com.codewithmosh.dryptoapi.dtos.WalletResponse;
 import com.codewithmosh.dryptoapi.exceptions.WalletNotFoundException;
 import com.codewithmosh.dryptoapi.mappers.WalletMapper;
+import com.codewithmosh.dryptoapi.repositories.TransactionRepository;
 import com.codewithmosh.dryptoapi.repositories.WalletRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class WalletService {
     private final CryptoPaymentGateway paymentGateway;
     private final WalletRepository walletRepository;
     private final WalletMapper walletMapper;
+    private final TransactionRepository transactionRepository;
 
 
     public void loadWallets() {
@@ -81,8 +83,10 @@ public class WalletService {
     public void deactivateExpiredWallets() {
         LocalDateTime now = LocalDateTime.now();
 
-        int updated = walletRepository.deactivateWalletsWithExpiredTransactions(now);
-        System.out.println("✅ Deactivated " + updated + " wallet(s) with expired transactions.");
+        int terminatedCount = transactionRepository.terminateExpiredTransactions(now);
+        int deactivatedCount = walletRepository.deactivateWalletsWithExpiredTransactions(now);
+
+        System.out.println(String.format("Terminated %d transactions and deactivated %d wallets.", terminatedCount, deactivatedCount));
     }
 
 

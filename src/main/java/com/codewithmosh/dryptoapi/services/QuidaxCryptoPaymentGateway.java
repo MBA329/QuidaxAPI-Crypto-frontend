@@ -168,6 +168,8 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
                     transaction.getWallet().setActive(false);
                     transaction.setTransactionId(id);
                     transaction.setTransactionHash(txid);
+                    transaction.setIsTerminated(true);
+
                     transactionRepository.save(transaction);
 
                     var response = serviceGateway.purchaseProduct(new VTPassPurchaseRequest(

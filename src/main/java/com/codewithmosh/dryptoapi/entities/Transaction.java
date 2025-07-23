@@ -71,6 +71,8 @@ public class Transaction {
     private LocalDateTime expiresAt;
 
     //add the isterminated attribute
+    @Column(name = "is_terminated")
+    private Boolean isTerminated;
 //    @Column(name = ) //not needed, aim must be achieved
 //    private LocalDateTime priceLockedAt;
 }
