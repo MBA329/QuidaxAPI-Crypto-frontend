@@ -195,6 +195,7 @@ public class VTPassUtilityServiceGateway implements UtilityServiceGateway {
             }
             existingTransaction.setDeliveryStatus(DeliveryStatus.DELIVERED);
             existingTransaction.getWallet().setActive(false);
+            existingTransaction.setIsTerminated(true);
 
             transactionRepository.save(existingTransaction); //touch grass
         } catch (Exception ex) {

@@ -64,7 +64,7 @@ public class PurchaseController {
                 serviceId,
                 "09079275768",
                 variationCode,
-                "08011111111");
+                "09079275768");
         var response = serviceGateway.purchaseProduct(buyRequest);
         return ResponseEntity.ok(response);
     }

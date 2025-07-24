@@ -163,12 +163,11 @@ public class QuidaxCryptoPaymentGateway implements CryptoPaymentGateway {
                     return;
                 }
 
-                if (amount.compareTo(transaction.getAmountCrypto()) >= 0) {
+                if (amount.compareTo(transaction.getAmountCrypto()) <= 0) {
                     transaction.setTransactionStatus(TransactionStatus.PAID);
                     transaction.getWallet().setActive(false);
                     transaction.setTransactionId(id);
                     transaction.setTransactionHash(txid);
-                    transaction.setIsTerminated(true);
 
                     transactionRepository.save(transaction);
 
