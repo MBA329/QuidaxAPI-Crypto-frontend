@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: store
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+
+  h2:
+    console:
+      enabled: true
+
+# Mock API keys for testing (replace with real ones when available)
+quidax:
+  secretKey: test-secret-key
+  baseUrl: https://app.quidax.io/api/v1
+
+vtpass:
+  secretKey: test-secret-key
+  publicKey: test-public-key
+  staticKey: test-static-key
+  baseUrl: https://sandbox.vtpass.com/api

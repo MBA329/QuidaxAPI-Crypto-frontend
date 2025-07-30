@@ -1,0 +1,171 @@
+{
+  "info": {
+    "name": "QuidaxAPI-Crypto Endpoints",
+    "description": "Collection for testing crypto-to-utility payment endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Message Controller",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/message/hello",
+              "host": ["{{baseUrl}}"],
+              "path": ["message", "hello"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Purchase Controller",
+      "item": [
+        {
+          "name": "Get Crypto Buy Price",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/purchase/buy-price/btcngn",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase", "buy-price", "btcngn"]
+            }
+          }
+        },
+        {
+          "name": "Get Available Networks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/purchase/networks",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase", "networks"]
+            }
+          }
+        },
+        {
+          "name": "Get Available Cryptocurrencies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/purchase/crypto-currencies",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase", "crypto-currencies"]
+            }
+          }
+        },
+        {
+          "name": "Fetch Data Plans",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/purchase/fetch-plans/mtn",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase", "fetch-plans", "mtn"]
+            }
+          }
+        },
+        {
+          "name": "Buy Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"08012345678\",\n  \"network\": \"mtn\",\n  \"billersCode\": \"08012345678\",\n  \"dataPlanCode\": \"mtn-data-500mb-30days\",\n  \"cryptoCurrency\": \"btc\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/purchase/buy-data",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase", "buy-data"]
+            }
+          }
+        },
+        {
+          "name": "Verify Purchase",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/purchase/verify/REQUEST_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase", "verify", "REQUEST_ID_HERE"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhook Controller",
+      "item": [
+        {
+          "name": "Quidax Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"payment.completed\",\n  \"data\": {\n    \"id\": \"payment_123\",\n    \"amount\": \"0.001\",\n    \"currency\": \"BTC\",\n    \"status\": \"completed\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/quidax",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "quidax"]
+            }
+          }
+        },
+        {
+          "name": "VTPass Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": {\n    \"transactions\": {\n      \"status\": \"delivered\",\n      \"product_name\": \"MTN Data\",\n      \"unique_element\": \"08012345678\",\n      \"unit_price\": 500,\n      \"quantity\": 1\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/vtpass",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "vtpass"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
